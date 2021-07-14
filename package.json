@@ -1,0 +1,24 @@
+{
+  "name": "profile-generator",
+  "version": "1.0.0",
+  "description": "Team Profile Generator",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest --verbose"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/grudgecat/profile-generator.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/grudgecat/profile-generator/issues"
+  },
+  "homepage": "https://github.com/grudgecat/profile-generator#readme",
+  "dependencies": {
+    "inquirer": "^8.1.1",
+    "jest": "^27.0.6"
+  }
+}
