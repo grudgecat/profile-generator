@@ -70,7 +70,7 @@ const engineerQuestions = [
     },
     {
         type: "input",
-        name: "githubname",
+        name: "github",
         message: "What is the engineer GitHub user name?"
     }
 ];
@@ -80,7 +80,7 @@ const controlQuestions = [
         type: "checkbox",
         name: "addanother",
         message: "Do you want to add an additional employee?",
-        choices: ['Engineer', 'Intern', 'No additional employees to add',]
+        choices: ['Engineer', 'Intern', 'None',],
     }
 ];
 
@@ -146,11 +146,53 @@ function addIntern(name, id, email, school) {
     console.log(myTeamCollection);
 }
 
+function askQ() {
+    inquirer
+      .prompt(controlQuestions)
+      .then((data) => {
+        const reply  = `${data.addanother}`;
+
+        if(reply === 'Engineer') {
+            inquirer  
+                .prompt(engineerQuestions)
+                .then((data) => {
+                    addEngineer(data.name, data.id, data.email, data.github); 
+                    // return "";     
+                })
+                .then((data) => {
+                    askQ();
+                })
+                .catch((error) => {
+                console.log(error);
+                });            
+        }
+        else if(reply === 'Intern') {
+            inquirer  
+                .prompt(internQuestions)
+                .then((data) => {
+                    addIntern(data.name, data.id, data.email, data.school); 
+                    // return "";     
+                })
+                .then((data) => {
+                    askQ();
+                })
+                .catch((error) => {
+                console.log(error);
+                });            
+        }
+        else {
+            return "None";
+        }
+      })
+    .catch((error) => {
+      console.log(error);
+    });
+}
+
 //GET MANAGER, THEN GET TEAM MEMBERS
 inquirer  
   .prompt(managerQuestions)
   .then((data) => {
-    //   console.log(data);
     addManager(data.name, data.id, data.email, data.phone);    
   })
   .then((reply) => {
@@ -160,25 +202,3 @@ inquirer
   console.log(error);
 });
 
-function askQ() {
-    inquirer
-      .prompt(controlQuestions)
-      .then((reply) => {
-        reply = reply.addanother;
-
-        if(reply === 'engineer') {
-            console.log('add engineer');
-            askQ();
-        }
-        else if(reply === 'intern') {
-            console.log('add intern');
-            askQ();
-        }
-        else {
-            return "none";
-        }
-      })
-    .catch((error) => {
-      console.log(error);
-    });
-}
