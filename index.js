@@ -128,25 +128,6 @@ const pageFooter = `
 // </div>
 // `;
 
-//GET MANAGER
-inquirer  
-  .prompt(managerQuestions)
-  .then((data) => {
-    //   console.log(data);
-    addManager(data.name, data.id, data.email, data.phone);    
-  })
-  .then((reply) => {
-      inquirer
-        .prompt(controlQuestions)
-        .then(data)
-            const response = data.addanother;
-            if(response !== 'none')
-                nextTeamMember(response);
-  })
-.catch((error) => {
-  console.log(error);
-});
-
 function addManager(name, id, email, phone) {
     const manager = new Manager(name, id, email, phone);
     myTeamCollection.push(manager);
@@ -165,16 +146,39 @@ function addIntern(name, id, email, school) {
     console.log(myTeamCollection);
 }
 
-function nextTeamMember(response) {
-    switch(response) {
-        case 'engineer':
-            console.log("engineer");
-        break;
-        case 'intern':
-            console.log("intern");
-        break;
-        default:
-            console.log('none');
+//GET MANAGER, THEN GET TEAM MEMBERS
+inquirer  
+  .prompt(managerQuestions)
+  .then((data) => {
+    //   console.log(data);
+    addManager(data.name, data.id, data.email, data.phone);    
+  })
+  .then((reply) => {
+    askQ();
+  })
+.catch((error) => {
+  console.log(error);
+});
+
+function askQ() {
+    inquirer
+      .prompt(controlQuestions)
+      .then((reply) => {
+        reply = reply.addanother;
+
+        if(reply === 'engineer') {
+            console.log('add engineer');
+            askQ();
+        }
+        else if(reply === 'intern') {
+            console.log('add intern');
+            askQ();
+        }
+        else {
             return "none";
-    }
+        }
+      })
+    .catch((error) => {
+      console.log(error);
+    });
 }
