@@ -14,7 +14,7 @@ Purpose: This project was created to explore node, classes/inheritance, dynamic 
 
 ## Project Links
 GitHub Source Code: https://github.com/grudgecat/profile-generator  \
-Demo Video link:  \
+Demo Video link:  https://drive.google.com/file/d/14MW3wTKDYvjacBUChgGCjgVC8duQ3lKt/view \
 
 ***
 ## Dependencies 
