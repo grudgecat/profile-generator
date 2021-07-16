@@ -86,6 +86,7 @@ const controlQuestions = [
 
 
 //OUTPUT VARIABLES
+let outputString = "";
 const pageHeader = `
 <!DOCTYPE html>
 <html lang="en">
@@ -112,76 +113,51 @@ const pageFooter = `
 </html>
 `;
 
-// let pageCardOutput = `
-// <div class='card'>
-// <div class='card-header'>
-//     <h2>${name}</h2>
-//     <h2>${role}</h2>
-// </div>
-// <div class='card-body'>
-//     <ul>
-//         <li>${id}</li>
-//         <li>${email}</li>
-//         <li>${special}</li>
-//     </ul>
-// </div>
-// </div>
-// `;
-
 function addManager(name, id, email, phone) {
     const manager = new Manager(name, id, email, phone);
     myTeamCollection.push(manager);
-    console.log(myTeamCollection);
 }
 
 function addEngineer(name, id, email, github) {
     const engineer = new Engineer(name, id, email, github);
     myTeamCollection.push(engineer);
-    console.log(myTeamCollection);
 }
 
 function addIntern(name, id, email, school) {
     const intern = new Intern(name, id, email, school);
     myTeamCollection.push(intern);
-    console.log(myTeamCollection);
 }
 
 function askQ() {
-    inquirer
+    return inquirer
       .prompt(controlQuestions)
       .then((data) => {
         const reply  = `${data.addanother}`;
 
         if(reply === 'Engineer') {
-            inquirer  
+            return inquirer  
                 .prompt(engineerQuestions)
                 .then((data) => {
-                    addEngineer(data.name, data.id, data.email, data.github); 
-                    // return "";     
-                })
-                .then((data) => {
-                    askQ();
+                    addEngineer(data.name, data.id, data.email, data.github);  
+                    return askQ();
                 })
                 .catch((error) => {
                 console.log(error);
                 });            
         }
         else if(reply === 'Intern') {
-            inquirer  
+            return inquirer  
                 .prompt(internQuestions)
                 .then((data) => {
                     addIntern(data.name, data.id, data.email, data.school); 
-                    // return "";     
-                })
-                .then((data) => {
-                    askQ();
+                    return askQ();  
                 })
                 .catch((error) => {
                 console.log(error);
                 });            
         }
         else {
-            return "None";
+            return;
         }
       })
     .catch((error) => {
@@ -193,12 +169,69 @@ function askQ() {
 inquirer  
   .prompt(managerQuestions)
   .then((data) => {
-    addManager(data.name, data.id, data.email, data.phone);    
+    addManager(data.name, data.id, data.email, data.phone);  
+    return askQ();  
   })
-  .then((reply) => {
-    askQ();
+  .then(() => {
+    generateTeamWebpage(myTeamCollection);
   })
 .catch((error) => {
   console.log(error);
 });
+
+//WRITE TEAM TO WEBPAGE
+function generateTeamCard(role, employee, id, email, special) {
+    let pageCardOutput = `
+    <div class='card'>
+    <div class='card-header'>
+        <h2>${employee}</h2>
+        <h2>${role}</h2>
+    </div>
+    <div class='card-body'>
+        <ul>
+            <li>ID: ${id}</li>
+            <li>EMAIL: ${email}</li>
+            <li>${special}</li>
+        </ul>
+    </div>
+    </div>
+    `;
+    return pageCardOutput;
+}
+
+function generateTeamWebpage(team) {
+    outputString = pageHeader;
+    team.forEach(element => {
+        const role = element.getRole();
+        const employee = element.getName();
+        const id = element.getId();
+        const email = element.getEmail();
+        let special = ""; 
+
+        if(role === 'Manager') {
+            special = `PHONE: ${element.getOfficeNumber()}`;
+        }
+        else if(role === 'Engineer') {
+            // special = `GITHUB NAME: https://github.com/${element.getGitHub()}`;
+            special = `<a href="https://github.com/${element.getGitHub()}" target="_blank">GITHUB NAME: https://github.com/${element.getGitHub()}</a>`;
+        }  
+        else {
+            special = `SCHOOL: ${element.getSchool()}`;
+        }
+
+        newCardOutput = generateTeamCard(role, employee, id, email, special);
+        outputString = outputString + newCardOutput;
+    });
+
+    outputString = outputString + pageFooter;
+    // console.log(outputString); 
+    // fs.writeFile('./output.html', outputString); 
+
+    const filepath =`./assets/output.html`
+    fs.writeFile(filepath,`
+        ${outputString}
+        `, (err) => 
+        err ? console.error(err) : console.log('Success!'))
+}
+
 

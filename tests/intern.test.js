@@ -2,7 +2,7 @@ const { it, expect } = require('@jest/globals');
 const Intern = require('../lib/intern.js');
 
 describe('Test Intern class constructor', () => {
-    describe('test setters', () => {
+    describe('test constructor', () => {
         it('name', () => {
             const intern = new Intern('John');
             expect(intern.name).toEqual('John');
@@ -20,7 +20,7 @@ describe('Test Intern class constructor', () => {
             expect(intern.school).toEqual('UW');
         })
     })
-    describe('test getters', () => {
+    describe('test methods', () => {
         it('getName', () => {
             const intern = new Intern('John');
             expect(intern.getName()).toEqual('John');
