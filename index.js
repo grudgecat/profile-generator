@@ -86,7 +86,9 @@ const controlQuestions = [
 
 
 //OUTPUT VARIABLES
+//used to build output string that will become full webpage
 let outputString = "";
+//page header 
 const pageHeader = `
 <!DOCTYPE html>
 <html lang="en">
@@ -106,6 +108,7 @@ const pageHeader = `
 
 `;
 
+//end of webpage
 const pageFooter = `
 </main>
 
@@ -113,6 +116,77 @@ const pageFooter = `
 </html>
 `;
 
+//generate stylesheet
+const styles = `
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: sans-serif;
+  background-color: white;
+}
+
+header {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  padding: 20px;
+  margin-bottom: 30px;
+  background-color: blueviolet;
+  color: white;
+}
+
+h2 {
+  margin-left: 10px;
+  padding: 5px;
+  margin-top: 20px;
+  margin-bottom: 0px;
+}
+
+main {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    padding: 25px;
+}
+
+li {
+    list-style: none;
+    padding: 5px;
+    border-style: dotted;
+    border-color: darkgray;
+    margin: 5px 0px 5px -35px;
+}
+
+.card {
+  background-color: silver;
+  border-radius: 5px;
+  border-width: 1px;
+  margin-bottom: 25px;
+  box-shadow: rgba(0, 0, 0, 0.15) 0px 2px 8px 0px;
+  color: white;
+  width: 400px;
+  padding: 10px;
+}
+
+.card-header {
+    background-color: blueviolet;
+    width: 100%;
+    margin-top: -20px;
+    border-radius: 5px;
+    border-width: 1px;
+    box-shadow: rgba(0, 0, 0, 0.15) 0px 2px 8px 0px;
+}
+
+.card-body {
+  color: black;
+}
+`
+
+//GENERATE NEW EMPLOYEE OBJECTS & ADD TO TEAM COLLECTION
 function addManager(name, id, email, phone) {
     const manager = new Manager(name, id, email, phone);
     myTeamCollection.push(manager);
@@ -128,12 +202,14 @@ function addIntern(name, id, email, school) {
     myTeamCollection.push(intern);
 }
 
+//ASK USER IF THEY WANT TO CONTINUE ADDING TEAM MEMBERS
+//Asks user if they want to add additional team members, 
+//uses type of employee to call add function for new member, then returns askQ to get next team member OR returns nothing to break chain
 function askQ() {
     return inquirer
       .prompt(controlQuestions)
       .then((data) => {
         const reply  = `${data.addanother}`;
-
         if(reply === 'Engineer') {
             return inquirer  
                 .prompt(engineerQuestions)
@@ -165,11 +241,14 @@ function askQ() {
     });
 }
 
-//GET MANAGER, THEN GET TEAM MEMBERS
+//INITIATE FUNCTION CALLS
+//GET MANAGER, THEN GET TEAM MEMBERS (askQ), THEN WRITE TO WEBPAGE
+//get manager first
 inquirer  
   .prompt(managerQuestions)
   .then((data) => {
-    addManager(data.name, data.id, data.email, data.phone);  
+    addManager(data.name, data.id, data.email, data.phone); 
+    //ask for more team members in recursive path until done
     return askQ();  
   })
   .then(() => {
@@ -179,7 +258,7 @@ inquirer
   console.log(error);
 });
 
-//WRITE TEAM TO WEBPAGE
+//CREATE NEW DATA CARD HTML BASED ON TEAM MEMBER DATA
 function generateTeamCard(role, employee, id, email, special) {
     let pageCardOutput = `
     <div class='card'>
@@ -199,15 +278,24 @@ function generateTeamCard(role, employee, id, email, special) {
     return pageCardOutput;
 }
 
+//WRITES GENERATED HTML STRING TO HTML FILE (as output.html in assets folder)
+//Takes team collection array as parameter, uses constants pageHeader & pageFooter to build full page
+//Requires imports: Employee classes defined in lib folder & fs module import to write docuemnt
 function generateTeamWebpage(team) {
+    //add page header to output string
     outputString = pageHeader;
+    const filepath =`./assets/`;
+    const outputHTML = `output.html`;
+    const outputCSS = `styles.css`;
+
+    //add each team member from team collection array to output string in a loop
     team.forEach(element => {
         const role = element.getRole();
         const employee = element.getName();
         const id = element.getId();
         const email = element.getEmail();
         let special = ""; 
-
+        //adjust last variable based on employee type
         if(role === 'Manager') {
             special = `PHONE: ${element.getOfficeNumber()}`;
         }
@@ -218,20 +306,19 @@ function generateTeamWebpage(team) {
         else {
             special = `SCHOOL: ${element.getSchool()}`;
         }
-
         newCardOutput = generateTeamCard(role, employee, id, email, special);
         outputString = outputString + newCardOutput;
     });
-
+    //add page footer to output string
     outputString = outputString + pageFooter;
-    // console.log(outputString); 
-    // fs.writeFile('./output.html', outputString); 
-
-    const filepath =`./assets/output.html`
-    fs.writeFile(filepath,`
+    //write webpage from output string content
+    fs.writeFile(`${filepath}${outputHTML}`,`
         ${outputString}
         `, (err) => 
-        err ? console.error(err) : console.log('Success!'))
+        err ? console.error(err) : console.log('output.html written'))
+
+    fs.writeFile(`${filepath}${outputCSS}`,`
+        ${styles}
+        `, (err) => 
+        err ? console.error(err) : console.log('styles.css written'))
 }
-
-
